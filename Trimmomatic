@@ -1,0 +1,27 @@
+# Trimmomatic script for multiple RNAseq sample
+
+# 1. Import
+import sys, re, os, string, glob
+
+# 2. Set paths and file format
+my_path = "c:/Workspace/Python/RNA-seq/NF2/NF2_CM/"
+trimmomatic_path = "c:/Workspace/Python/RNA-seq/Tools/Trimmomatic-0.39/"
+data_path = "01_Rawdata"
+os.chdir(my_path + data_path)
+file = glob.glob("*R1_001.fastq.gz")
+
+os.chdir(my_path + "02_Trimmomatic")
+
+# 3. Run trimmomatic using loop
+for id_R1 in file:
+    id_R2 = id_R1.replace("R1", "R2")
+    id_log = id_R1.replace("_R1_001.fastq.gz", ".log")
+
+    id_R1_output = id_R1.replace("R1_001.fastq.gz", "R1_001_trimmed.fastq.gz")
+    id_R1_output_unpaired = id_R1.replace("R1_001.fastq.gz", "R1_001_unpaired.fastq.gz")
+    id_R2_output = id_R2.replace("R2_001.fastq.gz", "R2_001_trimmed.fastq.gz")
+    id_R2_output_unpaired = id_R2.replace("R1_001.fastq.gz", "R1_001_unpaired.fastq.gz")
+    cmd = "java -jar %strimmomatic-0.39.jar PE -threads 16 -phred33 ../%s/%s ../%s/%s %s %s %s %s ILLUMINACLIP:TruSeq3-PE-2.fa:2:30:10 MINLEN:75 2> %s" %(trimmomatic_path, data_path, id_R1, data_path, id_R2, id_R1_output, id_R1_output_unpaired, id_R2_output, id_R2_output_unpaired, id_log)
+    
+    print(cmd)
+    os.system(cmd)
